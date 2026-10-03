@@ -1,0 +1,3 @@
+FitBuddy performance evidence
+Status: TO BE POPULATED
+Run the load test for 25 concurrent users in mock-AI mode.

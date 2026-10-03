@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}All users{% endblock %}
+
+{% block content %}
+{% from "_plan.html" import render_plan %}
+<section class="card full page-users">
+  <h1 class="page-title">All users</h1>
+  <p class="lead">{{ users|length }} registered user{{ '' if users|length == 1 else 's' }}. Compare each original plan with its feedback-updated version.</p>
+
+  {% if users %}
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>User ID</th><th>Age</th><th>Weight</th><th>Goal</th><th>Intensity</th>
+          <th>Original plan</th><th>Updated plan</th><th>Feedback</th><th class="th-actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for user in users %}
+        {% set plan = plans.get(user.user_id) %}
+        <tr class="user-row">
+          <td class="td-name">{{ user.username }}</td>
+          <td class="td-id"><a href="/result/{{ user.user_id }}">{{ user.user_id }}</a></td>
+          <td class="td-num">{{ user.age }}</td>
+          <td class="td-num">{{ user.weight }} kg</td>
+          <td class="td-goal">{{ user.goal }}</td>
+          <td class="td-intensity">{{ user.intensity|capitalize }}</td>
+          <td class="td-plan{% if not plan %} td-plan--empty{% endif %}">
+            {% if plan %}<details class="plan-toggle"><summary>View</summary><div class="plan-box">{{ render_plan(plan.original_plan) }}</div></details>
+            {% else %}-{% endif %}
+          </td>
+          <td class="td-plan{% if not (plan and plan.updated_plan) %} td-plan--empty{% endif %}">
+            {% if plan and plan.updated_plan %}<details class="plan-toggle"><summary>View</summary><div class="plan-box plan-box--updated">{{ render_plan(plan.updated_plan) }}</div></details>
+            {% else %}Not updated{% endif %}
+          </td>
+          <td class="td-feedback">{{ plan.feedback if plan and plan.feedback else '-' }}</td>
+          <td class="td-actions">
+            <form class="row-form" action="/delete-user" method="post"
+                  onsubmit='return confirm({{ ("Delete " ~ user.username ~ " and their plans?")|tojson }});'>
+              <input type="hidden" name="user_id" value="{{ user.user_id }}">
+              <button class="btn danger small" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <p>No users yet.</p>
+    <a class="btn" href="/">Create the first plan</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

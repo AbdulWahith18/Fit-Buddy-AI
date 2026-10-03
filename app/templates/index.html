@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}AI Workout Generator{% endblock %}
+
+{% block content %}
+<section class="card page-generate">
+  <h1 class="page-title">Build your 7-day workout plan</h1>
+  <p class="lead">Tell us about yourself and Gemini will write a plan around your goal and intensity.</p>
+
+  {% if errors %}
+  <div class="alert error" role="alert">
+    <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form class="form-stack plan-form" action="/generate-workout" method="post" data-loading="Building your plan...">
+    <div class="row">
+      <div class="field">
+        <label for="username">Name</label>
+        <input id="username" name="username" type="text" maxlength="50" required
+               placeholder="Your name" value="{{ form.get('username', '') }}">
+      </div>
+      <div class="field">
+        <label for="user_id">User ID</label>
+        <input id="user_id" name="user_id" type="text" maxlength="50" required
+               pattern="[A-Za-z0-9_.\-]+" placeholder="e.g. alex_01" value="{{ form.get('user_id', '') }}">
+      </div>
+    </div>
+    <span class="hint field-hint">Letters, numbers, _ . - only. You'll use this ID to send feedback. Reusing an existing ID replaces that user's saved plan.</span>
+
+    <div class="row">
+      <div class="field">
+        <label for="age">Age</label>
+        <input id="age" name="age" type="number" min="10" max="100" required
+               placeholder="25" value="{{ form.get('age', '') }}">
+      </div>
+      <div class="field">
+        <label for="weight">Weight (kg)</label>
+        <input id="weight" name="weight" type="number" min="21" max="400" step="0.1" required
+               placeholder="70" value="{{ form.get('weight', '') }}">
+      </div>
+    </div>
+
+    <label for="goal">Fitness goal</label>
+    <select id="goal" name="goal" required>
+      {% for g in goals %}
+      <option value="{{ g }}" {% if form.get('goal') == g %}selected{% endif %}>{{ g }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="intensity">Workout intensity</label>
+    <select id="intensity" name="intensity" required>
+      {% for i in intensities %}
+      <option value="{{ i }}" {% if form.get('intensity', 'medium') == i %}selected{% endif %}>{{ i|capitalize }}</option>
+      {% endfor %}
+    </select>
+
+    <button class="btn block" type="submit">Generate plan</button>
+  </form>
+</section>
+{% endblock %}

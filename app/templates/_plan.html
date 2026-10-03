@@ -1,0 +1,42 @@
+{#- Turns the plain-text plan into day cards. Put this file next to base.html. -#}
+{% macro render_plan(text) -%}
+{%- set ns = namespace(day=false, list=false) -%}
+<div class="plan-view">
+{%- for raw in (text or '').splitlines() -%}
+  {%- set s = raw.strip() -%}
+  {%- set line = s.replace('**', '').replace('__', '').lstrip('# ').strip() -%}
+  {%- if line -%}
+    {%- if line.lower().startswith('day ') and line[4:5].isdigit() -%}
+      {%- if ns.list %}</ul>{% set ns.list = false %}{% endif -%}
+      {%- if ns.day %}</section>{% endif -%}
+      {%- set ns.day = true -%}
+      {%- set sep = ' - ' if ' - ' in line else (' – ' if ' – ' in line else ': ') -%}
+      {%- set parts = line.split(sep, 1) %}
+<section class="plan-day{% if 'rest' in line.lower() %} plan-day--rest{% endif %}">
+  <header class="plan-day-head">
+    <span class="plan-day-num">{{ parts[0].rstrip(':') }}</span>
+    {%- if parts|length > 1 %}<h3 class="plan-day-title">{{ parts[1] }}</h3>{% endif %}
+  </header>
+    {%- elif s.startswith(('- ', '• ', '* ')) -%}
+      {%- if not ns.list %}<ul class="plan-list">{% set ns.list = true %}{% endif -%}
+      {%- set item = line[2:].strip() %}
+  <li class="plan-item">
+    {%- if ':' in item %}{% set bits = item.split(':', 1) %}<span class="ex-name">{{ bits[0] }}</span><span class="ex-detail">{{ bits[1].strip() }}</span>
+    {%- else %}<span class="ex-name">{{ item }}</span>{% endif -%}
+  </li>
+    {%- else -%}
+      {%- if ns.list %}</ul>{% set ns.list = false %}{% endif -%}
+      {%- if line.endswith(':') %}
+  <h4 class="plan-sub">{{ line.rstrip(':') }}</h4>
+      {%- elif ':' in line[:48] %}{% set bits = line.split(':', 1) %}
+  <p class="plan-note"><strong class="plan-label">{{ bits[0] }}:</strong> {{ bits[1].strip() }}</p>
+      {%- else %}
+  <p class="plan-text">{{ line }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if ns.list %}</ul>{% endif -%}
+{%- if ns.day %}</section>{% endif %}
+</div>
+{%- endmacro %}

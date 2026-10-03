@@ -1,0 +1,3 @@
+FitBuddy automated test evidence
+Status: TO BE POPULATED
+The supplied README specifies an expected suite of 19 tests. Execute `pytest -v` in the project environment before submission to record the actual result.

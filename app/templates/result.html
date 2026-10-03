@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Plan for {{ username }}{% endblock %}
+
+{% block content %}
+{% from "_plan.html" import render_plan %}
+<section class="card wide page-result">
+  {% if message %}<div class="alert ok" role="status">{{ message }}</div>{% endif %}
+  {% if notice %}<div class="alert info">{{ notice }}</div>{% endif %}
+  {% if error %}<div class="alert error" role="alert">{{ error }}</div>{% endif %}
+
+  <h1 class="page-title">{{ username }}'s workout plan</h1>
+
+  <dl class="summary">
+    <div class="stat"><dt class="stat-label">User ID</dt><dd class="stat-value">{{ user_id }}</dd></div>
+    <div class="stat"><dt class="stat-label">Age</dt><dd class="stat-value">{{ age }}</dd></div>
+    <div class="stat"><dt class="stat-label">Weight</dt><dd class="stat-value">{{ weight }} kg</dd></div>
+    <div class="stat"><dt class="stat-label">Goal</dt><dd class="stat-value">{{ goal }}</dd></div>
+    <div class="stat"><dt class="stat-label">Intensity</dt><dd class="stat-value">{{ intensity|capitalize }}</dd></div>
+    <div class="stat stat--highlight"><dt class="stat-label">Plan version</dt><dd class="stat-value">{% if is_updated %}Updated{% else %}Original{% endif %}</dd></div>
+  </dl>
+
+  <h2 class="section-title">7-day workout plan {% if is_updated %}<span class="badge">Updated</span>{% endif %}</h2>
+  <div class="plan-box plan-box--current">{{ render_plan(workout_plan) }}</div>
+
+  {% if is_updated %}
+  <details class="plan-toggle">
+    <summary>Show original plan</summary>
+    <div class="plan-box plan-box--original">{{ render_plan(original_plan) }}</div>
+  </details>
+  {% if last_feedback %}<p class="hint last-feedback">Last feedback applied: "{{ last_feedback }}"</p>{% endif %}
+  {% endif %}
+
+  <h2 class="section-title">Nutrition / recovery tip</h2>
+  <div class="tip tip-text">{{ nutrition_tip or "No tip yet." }}</div>
+  <div class="actions actions--tip">
+    <form action="/nutrition-tip" method="post" data-loading="Getting a new tip...">
+      <input type="hidden" name="user_id" value="{{ user_id }}">
+      <button class="btn ghost small" type="submit">Get another tip</button>
+    </form>
+  </div>
+
+  <h2 class="section-title">Not quite right? Tell us what to change</h2>
+  <form class="form-stack feedback-form" action="/submit-feedback" method="post" data-loading="Updating your plan...">
+    <label for="user_id">User ID</label>
+    <input id="user_id" name="user_id" type="text" required value="{{ user_id }}">
+    <label for="feedback">Your feedback</label>
+    <textarea id="feedback" name="feedback" required minlength="3" maxlength="1000"
+              placeholder="e.g. More focus on cardio, include more rest days, add yoga"></textarea>
+    <button class="btn" type="submit">Update my plan</button>
+  </form>
+
+  <div class="actions actions--footer">
+    <a class="btn ghost small" href="/">Create another plan</a>
+    <a class="btn ghost small" href="/view-all-users">All users</a>
+  </div>
+</section>
+{% endblock %}

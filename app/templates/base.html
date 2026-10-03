@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FitBuddy{% endblock %} | FitBuddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Fit<span class="brand-accent">Buddy</span></a>
+    <nav class="nav">
+      <a href="/" class="nav-link{% if request.url.path == '/' %} active{% endif %}">New plan</a>
+      <a href="/feedback" class="nav-link{% if request.url.path == '/feedback' %} active{% endif %}">Give feedback</a>
+      <a href="/view-all-users" class="nav-link{% if request.url.path == '/view-all-users' %} active{% endif %}">All users</a>
+      <a href="/docs" class="nav-link nav-link--api">API docs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="loading" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <div class="loading-text"><strong id="loading-title" class="loading-heading">Working on it...</strong><br><span class="hint loading-sub">Gemini can take 10-40 seconds. Please don't close this page.</span></div>
+  </div>
+
+  <script>
+    // Show a progress overlay while Gemini is generating (forms marked with data-loading).
+    document.querySelectorAll('form[data-loading]').forEach(function (form) {
+      form.addEventListener('submit', function () {
+        if (!form.checkValidity()) return;
+        document.getElementById('loading-title').textContent = form.dataset.loading;
+        document.getElementById('loading').classList.add('show');
+        form.querySelectorAll('button[type=submit]').forEach(function (b) { b.disabled = true; });
+      });
+    });
+    // Back/forward cache: hide the overlay if the page is restored from history.
+    window.addEventListener('pageshow', function () {
+      document.getElementById('loading').classList.remove('show');
+      document.querySelectorAll('button[type=submit]').forEach(function (b) { b.disabled = false; });
+    });
+  </script>
+</body>
+</html>

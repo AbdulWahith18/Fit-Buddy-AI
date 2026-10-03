@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Plan feedback{% endblock %}
+
+{% block content %}
+<section class="card page-feedback">
+  <h1 class="page-title">Refine your plan</h1>
+  <p class="lead">Enter your User ID and tell us what to change. Gemini will rewrite your plan.</p>
+
+  {% if errors %}
+  <div class="alert error" role="alert">
+    <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form class="form-stack" action="/submit-feedback" method="post" data-loading="Updating your plan...">
+    <label for="user_id">User ID</label>
+    <input id="user_id" name="user_id" type="text" required maxlength="50"
+           placeholder="The ID you used when creating your plan" value="{{ user_id }}">
+
+    <label for="feedback">Your feedback</label>
+    <textarea id="feedback" name="feedback" required minlength="3" maxlength="1000"
+              placeholder="e.g. More focus on cardio, include more rest days">{{ feedback }}</textarea>
+
+    <button class="btn block" type="submit">Update my plan</button>
+  </form>
+</section>
+{% endblock %}
